@@ -1,2 +1,2 @@
 # pygame-art
-basic animations
+anima tions

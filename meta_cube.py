@@ -1,5 +1,7 @@
 # metatron's cube
 
+# metatron's cube
+
 import pygame as pg
 import time
 from math import sin, cos, pi
@@ -32,19 +34,20 @@ class Circle:
       pg.draw.circle(window, white, (int(self.center[0]), int(self.center[1])), int(self.radius), 1)
       self.center[0] = self.display_center[0] + self.hypotenuse * cos(self.theta)  # update circle center
       self.center[1] = self.display_center[1] - self.hypotenuse * sin(self.theta)
-      if i < 13:  # don't append the last center
-        self.centers.append(self.center)  # append current center to list of centers
-      self.theta += pi / 3  # increment theta
+      if i < 13:  # don't append the last center bc it's the large outer circle 
+        center = self.center[:]  # create a copy so that they are not the same object
+        self.centers.append(center)  # append current center to list of centers
+      self.theta += pi / 3  # increment theta to adjust position of next circle
       i += 1  # increment iteration counter
-      if i == 6:  # if done drawing inner layer of circles, double hypotenuse to draw outer layer
+      if i == 6:  # if done drawing inner layer of circles, double the hypotenuse to draw outer layer
         self.hypotenuse += self.hypotenuse
-      time.sleep(.2)  # pause
-      pg.display.update()
+      time.sleep(.2)  # pause for effect
+      pg.display.update()  # this update displays one circle at a time
     for i in self.centers:
-      print(self.display_center)
-      pg.draw.line(window, white, self.display_center, i)
-      time.sleep(.2)
-      pg.display.update()
+      for j in self.centers:
+        pg.draw.line(window, white, i, j)
+        time.sleep(.2)
+        pg.display.update()  # this update displays one line at a time
     self.drawn = True  # use bool to only draw once (see main loop)
 
 
@@ -54,8 +57,8 @@ def main():
     for event in pg.event.get():
       if event.type == pg.QUIT:
         quit()
-    if not metatrons_cube.drawn:  # only draw once
-      metatrons_cube.draw()  # draw
+    if not metatrons_cube.drawn:  # the function only runs once
+      metatrons_cube.draw()  # draw the cube
         
 
 if __name__ == '__main__':

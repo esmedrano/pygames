@@ -1,4 +1,7 @@
-# metatron's cube
+# Metatron's Cube
+# by Elijah Medrano
+# 2/14/22
+# This program draws Metatron's Cube
 
 import pygame as pg
 import time

@@ -1,7 +1,5 @@
 # metatron's cube
 
-# metatron's cube
-
 import pygame as pg
 import time
 from math import sin, cos, pi

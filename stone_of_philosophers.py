@@ -1,5 +1,5 @@
 import pygame as pg
-from math import pi, sin, cos
+from math import pi, sqrt, sin, cos
 
 pg.init()
 DISPLAY_W = 500
@@ -34,8 +34,7 @@ class Regular_Polygon:
   
 
 def stone_of_philosophers(center_radius):
-  triangle = Regular_Polygon(window, RED, 3, (CENTER[0] + 2 * center_radius, CENTER[1] + 2 * center_radius), 
-                             2 * center_radius + 2 * center_radius / SQRT_3 * 2)
+  triangle = Regular_Polygon(window, RED, 3, (CENTER[0] + sqrt((2 * center_radius) ** 2), CENTER[1] - center_radius ** 2 + 2 * center_radius), 2 * center_radius + 2 * center_radius / SQRT_3 * 2)
   pg.draw.circle(window, BLUE, CENTER, center_radius, 1)
   pg.draw.rect(window, GREEN, (CENTER[0] - center_radius, CENTER[1] - center_radius, 
                                center_radius * 2, center_radius * 2), 1)
@@ -58,3 +57,4 @@ def main():
 
 if __name__ == '__main__':
   main()
+

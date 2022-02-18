@@ -1,3 +1,8 @@
+# Phiolopher's Stone
+# by Elijah Medrano
+# 2/17/22
+# This program draws the philosopher's stone using a regular polygon class to draw the triangle
+
 import pygame as pg
 import operator
 from math import pi, sqrt, sin, cos
@@ -28,48 +33,56 @@ class Regular_Polygon:
 
   def draw(self):
     ops = {0: operator.add, 1: operator.sub, 3: 0}
-    rotation_ang =  2 * pi / self.side_num
-    inner_angle = pi / self.side_num
+    rotation_ang =  360 / self.side_num
+    inner_angle = (self.side_num - 2) * pi / self.side_num
     angle_count = 0
-    endpoint = [0, 0]
+    endpoint = self.pos[:]
     pos = self.pos[:]
-    for _ in [*range(0, self.side_num)]:
-      angle_count += rotation_ang
-      if angle_count < pi / 2:
+    for i in [*range(0, self.side_num)]:
+      angle_count += rotation_ang 
+      if angle_count < 90:
         op_x = 0
         op_y = 1
-      elif angle_count == pi / 2:
+      elif angle_count == 90:
         op_x = 3
         op_y = 1
-      elif pi / 2 < angle_count < pi:
+      elif 90 < angle_count < 180:
         op_x = 1
         op_y = 1
-      elif angle_count == pi:
+      elif angle_count == 180:
         op_x = 1
         op_y = 3
-      elif pi < angle_count < 3 * pi / 2:
+      elif 180 < angle_count < 270:
         op_x = 1
         op_y = 0
-      elif angle_count == 3 * pi / 2:
+      elif angle_count == 270:
         op_x = 3
         op_y = 0
-      elif 3 * pi / 2 < angle_count < 2 * pi:
+      elif 270 < angle_count < 360:
         op_x = 0
         op_y = 0
-      elif angle_count == 2 * pi:
+      elif angle_count == 360:
         op_x = 0
         op_y = 3
+      # angle_count = angle_count - i * 90
+      angle_count = angle_count * pi / 180
       if op_x != 3:
-        endpoint[0] = ops[op_x](pos[0], self.side_len * abs(cos(inner_angle)))
+        # endpoint[0] = ops[op_x](pos[0], self.side_len * abs(cos(inner_angle)))
+        endpoint[0] = ops[op_x](pos[0], self.side_len * abs(cos(angle_count)))
         if op_y == 3:
           endpoint[0] = ops[op_x](pos[0], self.side_len)
       if op_y != 3:
-        endpoint[1] = ops[op_y](pos[1], self.side_len * abs(sin(inner_angle)))
+        # endpoint[1] = ops[op_y](pos[1], self.side_len * abs(sin(inner_angle)))
+        endpoint[1] = ops[op_x](pos[1], self.side_len * abs(sin(angle_count)))
         if op_x == 3:
           endpoint[1] = ops[op_y](pos[1], self.side_len)
       pg.draw.line(self.surface, self.color, pos, endpoint)
       self.vertices.append(pos)
       pos = endpoint[:]
+      pg.draw.circle(window, BLUE, (int(pos[0]), int(pos[1])), 5)
+      print(angle_count)
+      print(inner_angle)
+      print(pos)
 
 
 def stone_of_philosophers(inner_radius):
@@ -86,6 +99,15 @@ def stone_of_philosophers(inner_radius):
   b = start_point[1] - centroid[1]
   outer_radius = int(sqrt(a ** 2 + b ** 2))
   pg.draw.circle(window, WHITE, centroid, outer_radius, 1)
+  pentagon = Regular_Polygon(window, WHITE, 5, [250, 250], 50)
+  pentagon.draw()
+  
+
+def regs():
+  for i in [*range(3, 10)]:
+      reg = Regular_Polygon(window, WHITE, i, [250, 250], 100)
+      reg.draw()
+
 
 
 def main():

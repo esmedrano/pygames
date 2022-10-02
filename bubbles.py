@@ -1,3 +1,6 @@
+# This program draws a random shape to the screen 
+# Hold space to redraw 
+
 import pygame as pg
 import random as rand
 
@@ -6,16 +9,6 @@ window_w = 500
 window_h = window_w  # The window of this drawing is a square
 window = pg.display.set_mode((window_w, window_h))
 pg.display.flip()
-
-
-def redraw():  # Redraw if space is pressed
-    keys = pg.key.get_pressed()
-    for key in keys:
-        if key == pg.K_SPACE:
-            window.fill(0, 0, 0)
-            return True
-        else:
-            return False
 
 
 def get_points():  # Define a random set of points within a set range
@@ -44,13 +37,13 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit()
-        if not drawn:
-            draw()
-            drawn = 1
         keys = pg.key.get_pressed()
         if keys[pg.K_SPACE]:
             window.fill((0, 0, 0))
             drawn = 0
+        if not drawn:
+            draw()
+            drawn = 1
 
 
 if __name__ == "__main__":

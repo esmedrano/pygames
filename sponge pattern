@@ -1,0 +1,161 @@
+# This code was written by chat GPT 4
+# Prompt: write some python to create a sponge like image similar to the density of the universe
+
+import numpy as np
+import pygame
+
+# Initialize Pygame
+pygame.init()
+
+# Define the size of the grid
+n = 256 * 2
+
+# Define screen dimensions
+screen_w = n
+screen_h = n
+
+# Set the size of the window
+screen = pygame.display.set_mode((n, n))
+
+# Phi
+phi = .618
+
+# RGB value of sponge color
+red = 140
+green = 140
+
+# Slider color
+black = (0, 0, 0)
+white = (255, 255, 255)
+
+# Set the initial values of the parameters
+power = 3
+sigma = 2
+threshold = .618
+
+
+def generate_field(power, n):
+    # Generate a random field with a power law spectrum
+    k = np.arange(n) - n / 2
+    kk = np.meshgrid(k, k, indexing='ij')
+    kk_mag = np.sqrt(kk[0] ** 2 + kk[1] ** 2)
+    P = np.where(kk_mag == 0, 0, kk_mag ** -power)
+    rand = np.random.normal(size=(n, n)) + 1j * np.random.normal(size=(n, n))
+    rand *= np.sqrt(P)
+    rand = np.fft.fft2(rand).real
+    return rand
+
+
+def smooth_field(field, sigma):
+    # Smooth the field with a Gaussian filter
+    n = field.shape[0]
+    k = np.arange(n) - n / 2
+    kk = np.meshgrid(k, k, indexing='ij')
+    kk_mag = np.sqrt(kk[0] ** 2 + kk[1] ** 2)
+    filter = np.exp(-kk_mag ** 2 / (2 * sigma ** 2))
+    field_smoothed = np.fft.ifft2(np.fft.fft2(field) * filter).real
+    return field_smoothed
+
+
+def rescale_field(field):
+    # Rescale the values to between 0 and 1
+    field_rescaled = (field - np.min(field)) / (np.max(field) - np.min(field))
+    return field_rescaled
+
+
+def generate_sponge(power, sigma, threshold, n):
+    # Generate the sponge image
+    rand = generate_field(power, n)
+    rand_smoothed = smooth_field(rand, sigma)
+    rand_rescaled = rescale_field(rand_smoothed)
+    sponge = np.where(rand_rescaled < threshold, 1, 0)
+    return sponge
+
+
+def create_sponge():
+    # Create the sponge image
+    sponge = generate_sponge(power, sigma, threshold, n)
+    print(power)
+
+    # Convert the numpy array to a Pygame surface
+    surf = pygame.surfarray.make_surface(sponge)
+
+    # Convert surface to 24-bit RGB format
+    surf = surf.convert(24)
+
+    # Get the pixel array from the surface
+    pixels = pygame.surfarray.array3d(surf)
+
+    # Modify the color map
+    non_black_pixels = pixels[:, :, 2] != 0
+    pixels[non_black_pixels, 0] = red  # Set red channel to 255
+    pixels[non_black_pixels, 1] = green  # Set green channel to 0
+
+    # Update the surface
+    pygame.surfarray.blit_array(surf, pixels)
+
+    return surf
+
+
+def sliders_dimensions():
+    # Define slider ranges
+    power_range = range(-10, 10)
+    sigma_range = range(-10, 10)
+    threshold_range = range(-10, 10)
+
+    # Define slider dimensions
+    slider_x = None
+    slider_y = screen_h - 100
+    slider_w = 140
+    slider_h = 20
+
+    slider_dim = [slider_x, slider_y, slider_w, slider_h, power_range, sigma_range, threshold_range]
+
+    return slider_dim
+
+
+def draw(sponge, power_dist, sigma_dist, threshold_dist):
+
+    # Draw the sponge
+    screen.blit(sponge, (0, 0))
+
+    # Update the screen
+    pygame.display.flip()
+
+
+def main():
+    # Initialize parameters
+    global power, sigma, threshold
+    power_dist = 0
+    sigma_dist = 0
+    threshold_dist = 0
+
+    # Left mouse button state to be true if mouse button is released
+    mouse_click = False
+
+    # Color the sponge
+    sponge = create_sponge()
+
+    # Draw screen
+    draw(sponge, power_dist, sigma_dist, threshold_dist)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        # Draw all items
+        sponge = create_sponge()
+        draw(sponge, power_dist, sigma_dist, threshold_dist)
+
+        # Reset the sponge if space bar is pressed
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            sponge = create_sponge()
+            draw(sponge, power_dist, sigma_dist, threshold_dist)
+        pygame.display.update()
+
+
+if __name__ == '__main__':
+    main()
